@@ -18,7 +18,7 @@ Ao preencher um formulário no AppSheet (vinculado ao Google Sheets), o script v
 
 ## 📝 Scripts
 
-Os scripts estão na pasta `/scripts`. O principal é `agendamento.js`, responsável por:
+Os scripts estão na pasta `/scripts`. O principal é `agendamento`, responsável por:
 
 - Validar os campos do formulário
 - Converter horários em blocos
