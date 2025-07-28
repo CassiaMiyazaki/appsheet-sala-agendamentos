@@ -1,7 +1,7 @@
 Google Apps Script: Agendamento de Salas
 
-Este projeto permite o agendamento de salas utilizando o AppSheet integrado ao Google Apps Script.
-Ao preencher um formulário no AppSheet (vinculado ao Google Sheets), o script verifica conflitos de horário e registra automaticamente os blocos de agendamento.
+Este projeto permite o agendamento de salas utilizando o googleSheet integrado ao Google Apps Script.
+Ao preencher um formulário no googleSheet ), o script verifica conflitos de horário e registra automaticamente os blocos de agendamento.
 
 ## 📌 Funcionalidades
 
@@ -13,7 +13,7 @@ Ao preencher um formulário no AppSheet (vinculado ao Google Sheets), o script v
 
 ## 🧠 Tecnologias Utilizadas
 
-- **Google Apps Script**
+- **Google Script**
 - **Google Sheets**
 
 ## 📝 Scripts
