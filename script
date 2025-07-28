@@ -1,0 +1,75 @@
+function enviarParaRegistro() {
+  const planilha = SpreadsheetApp.getActiveSpreadsheet();
+  const formulario = planilha.getSheetByName("Formulário");
+  const destino = planilha.getSheetByName("Registros");
+
+  formulario.getRange("A1").activate(); // ou qualquer célula que não interfira
+
+  const valores = formulario.getRange("B16:G16").getValues()[0]; 
+  const [sala, data, inicio, fim, finalidade, responsavel] = valores;
+  const campos = ["SALA", "DATA", "INÍCIO", "FIM", "FINALIDADE", "RESPONSÁVEL"];
+
+  for (let i = 0; i < valores.length; i++) {
+    if (valores[i] === null || valores[i].toString().trim() === "") {
+      SpreadsheetApp.getUi().alert(`Preencha o campo: ${campos[i]}`);
+      return;
+    }
+  }
+
+  const inicioMin = horaParaMinutos(inicio.toString());
+  const fimMin = horaParaMinutos(fim.toString());
+
+  if (fimMin <= inicioMin) {
+    SpreadsheetApp.getUi().alert("⛔ Hora final deve ser depois da hora inicial.");
+    return;
+  }
+
+  const blocos = [];
+  for (let m = inicioMin; m < fimMin; m += 30) {
+    const horarioTexto = minutosParaHora(m);
+    blocos.push([sala, data, horarioTexto, finalidade, responsavel]);
+  }
+
+  if (blocos.length === 0) {
+    SpreadsheetApp.getUi().alert("⛔ Nenhum bloco de horário foi gerado.");
+    return;
+  }
+
+  // ✅ Verificar conflitos
+  const registros = destino.getDataRange().getValues();
+  const horariosSolicitados = blocos.map(b => b[2]); // horários dos blocos
+
+  const conflitos = registros.filter(linha => {
+    const [salaExistente, dataExistente, horaExistente] = linha;
+    return (
+      salaExistente === sala &&
+      dataExistente.toString() === data.toString() &&
+      horariosSolicitados.includes(horaExistente)
+    );
+  });
+
+  if (conflitos.length > 0) {
+    const horasConflitantes = conflitos.map(l => l[2]).join(", ");
+    SpreadsheetApp.getUi().alert(`⛔ Conflito! A sala já está ocupada nos horários: ${horasConflitantes}`);
+    return;
+  }
+
+  const ultimaLinha = destino.getLastRow() + 1;
+  destino.getRange(ultimaLinha, 1, blocos.length, 5).setValues(blocos);
+
+  formulario.getRange("B16:G16").clearContent();
+  SpreadsheetApp.getUi().alert("✅ Agendamento enviado com sucesso!");
+}
+
+function horaParaMinutos(horaTexto) {
+  const partes = horaTexto.split(":");
+  const horas = parseInt(partes[0], 10);
+  const minutos = parseInt(partes[1], 10);
+  return horas * 60 + minutos;
+}
+
+function minutosParaHora(minutos) {
+  const horas = Math.floor(minutos / 60);
+  const mins = minutos % 60;
+  return (horas < 10 ? "0" : "") + horas + ":" + (mins < 10 ? "0" : "") + mins;
+}
